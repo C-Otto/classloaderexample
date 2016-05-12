@@ -7,7 +7,7 @@ To reproduce run `mvn clean verify`. The test is copied into two variants so tha
 # Problem 2
 The application only starts on Tomcat if
   - DBCP is used, or
-  - ~~the Tomcat connection pool is used and JPA uses the `DataSource`'s classloader~~ (see below)
+  - the Tomcat connection pool is used and JPA uses the `DataSource`'s classloader and the app is deployed on a real Tomcat server (so not using `mvn tomcat7:run`)
 
 To reproduce, you need to be able to connect to some (local?) PostgreSQL instance.
 For this, configure the credentials in the JSON string below (https://jsonformatter.curiousconcept.com/ might help with the formatting) and export the two values as environment variables.
@@ -109,7 +109,7 @@ Caused by: java.lang.ClassNotFoundException: com.test.BaseEntity
         ... 45 more
 ```
 
-Although not mentioned in the StackOverflow question, I get another error when I use Tomcat's connection pool (`CloudDatabaseConfig`) and do not re-configure the classloder (`JpaConfig`):
+I get another error when I start using `mvn tomcat7:run`, use Tomcat's connection pool (`CloudDatabaseConfig`) and do not re-configure the classloder (`JpaConfig`):
 ```
 SEVERE: Error configuring application listener of class com.test.ContextListener
 org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jpaMappingContext': Invocation of init method failed; nested exception is javax.persistence.PersistenceException: Exception [EclipseLink-4002] (Eclipse Persistence Services - 2.6.2.v20151217-774c696): org.eclipse.persistence.exceptions.DatabaseException
@@ -191,6 +191,33 @@ Caused by: java.lang.ClassNotFoundException: org.postgresql.Driver
         at java.lang.Class.forName(Class.java:348)
         at org.apache.tomcat.jdbc.pool.PooledConnection.connectUsingDriver(PooledConnection.java:246)
         ... 52 more
+```
+
+With a real Tomcat the application starts when I do not re-configure the classpath. With the `DataSource`'s classpath I get:
+```
+Exception Description: Unable to find the class named [com.test.BaseEntity]. Ensure the class name/path is correct and available to the classloader.
+Internal Exception: java.lang.ClassNotFoundException: com.test.BaseEntity
+	at org.eclipse.persistence.exceptions.EntityManagerSetupException.deployFailed(EntityManagerSetupException.java:239)
+	... 79 more
+Caused by: Exception [EclipseLink-7156] (Eclipse Persistence Services - 2.6.2.v20151217-774c696): org.eclipse.persistence.exceptions.ValidationException
+Exception Description: Unable to find the class named [com.test.BaseEntity]. Ensure the class name/path is correct and available to the classloader.
+Internal Exception: java.lang.ClassNotFoundException: com.test.BaseEntity
+	at org.eclipse.persistence.exceptions.ValidationException.unableToLoadClass(ValidationException.java:2007)
+	at org.eclipse.persistence.internal.jpa.metadata.listeners.EntityListenerMetadata.getClass(EntityListenerMetadata.java:227)
+	at org.eclipse.persistence.internal.jpa.metadata.listeners.EntityClassListenerMetadata.process(EntityClassListenerMetadata.java:81)
+	at org.eclipse.persistence.internal.jpa.metadata.accessors.classes.EntityAccessor.processListeners(EntityAccessor.java:1226)
+	at org.eclipse.persistence.internal.jpa.metadata.MetadataProcessor.addEntityListeners(MetadataProcessor.java:140)
+	at org.eclipse.persistence.internal.jpa.EntityManagerSetupImpl.deploy(EntityManagerSetupImpl.java:637)
+	... 77 more
+Caused by: java.lang.ClassNotFoundException: com.test.BaseEntity
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:381)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:348)
+	at org.eclipse.persistence.internal.security.PrivilegedAccessHelper.getClassForName(PrivilegedAccessHelper.java:139)
+	at org.eclipse.persistence.internal.jpa.metadata.listeners.EntityListenerMetadata.getClass(EntityListenerMetadata.java:224)
+	... 81 more
 ```
 
 You can also experiment with the classloader to use for JPA by registering `JpaConfig` instead of `JpaConfigWithDatasourceClassloader`.
