@@ -6,8 +6,8 @@ To reproduce run `mvn clean verify`. The test is copied into two variants so tha
 
 # Problem 2
 The application only starts on Tomcat if
- - the Tomcat connection pool is used and JPA uses the `DataSource`'s classloader, or
- - DBCP is used
+  - DBCP is used, or
+  - ~~the Tomcat connection pool is used and JPA uses the `DataSource`'s classloader~~ (see below)
 
 To reproduce, you need to be able to connect to some (local?) PostgreSQL instance.
 For this, configure the credentials in the JSON string below (https://jsonformatter.curiousconcept.com/ might help with the formatting) and export the two values as environment variables.
