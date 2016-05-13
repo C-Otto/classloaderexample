@@ -110,6 +110,9 @@ Caused by: java.lang.ClassNotFoundException: com.test.BaseEntity
 ```
 
 I get another error when I start using `mvn tomcat7:run`, use Tomcat's connection pool (`CloudDatabaseConfig`) and do not re-configure the classloder (`JpaConfig`):
+
+**EDIT: Solved, see http://stackoverflow.com/a/37196365/947526**
+
 ```
 SEVERE: Error configuring application listener of class com.test.ContextListener
 org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'jpaMappingContext': Invocation of init method failed; nested exception is javax.persistence.PersistenceException: Exception [EclipseLink-4002] (Eclipse Persistence Services - 2.6.2.v20151217-774c696): org.eclipse.persistence.exceptions.DatabaseException
