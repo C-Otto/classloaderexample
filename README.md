@@ -1,4 +1,4 @@
-This project exists to demonstrate the problem outlined in https://stackoverflow.com/questions/37071821/spring-webapplicationinitializer-servletcontainerinitializer-handlestypes-wi
+This project exists to demonstrate the problem outlined in https://stackoverflow.com/questions/36885891/jpa-eclipselink-understanding-classloader-issues
 
 # Problem 1
 The test only passes if the classloader for JPA is set to the `DataSource`'s classloader.
